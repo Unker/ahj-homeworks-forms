@@ -1,6 +1,6 @@
 import puppetteer from 'puppeteer';
 
-jest.setTimeout(30000); // default puppeteer timeout
+jest.setTimeout(5000); // default puppeteer timeout
 
 describe('Credit Card Validator form', () => {
   let browser = null;
@@ -11,7 +11,7 @@ describe('Credit Card Validator form', () => {
     browser = await puppetteer.launch({
       headless: false, // show gui
       slowMo: 50,
-      devtools: true, // show devTools
+      devtools: false,
     });
     page = await browser.newPage();
   });
@@ -21,39 +21,27 @@ describe('Credit Card Validator form', () => {
     // server.kill();
   });
 
-  test('should be true if card numbre', async () => {
+  test('should show and remove popover', async () => {
     await page.goto(baseUrl);
 
-    const form = await page.$('.card-form-widget');
-    const input = await form.$('.input');
-    const submit = await form.$('.submit');
+    const button = await page.$('.btn-danger');
 
-    await input.type('4111111111111111');
-    await submit.click();
+    await button.click();
+    await page.waitForSelector('.popover');
 
-    const el = await input.getProperty('className');
-    let classList = await el.jsonValue();
-    classList = classList.split(' ');
+    const popoverHeader = await page.$('.popover-header');
+    const popoverBody = await page.$('.popover-body');
 
-    expect(classList.includes('invalid')).toBe(false);
-    expect(classList.includes('valid')).toBe(true);
-  });
+    const headerText = await page.evaluate((el) => el.textContent, popoverHeader);
+    const bodyText = await page.evaluate((el) => el.textContent, popoverBody);
 
-  test('should be false if card numbre', async () => {
-    await page.goto(baseUrl);
+    expect(headerText.trim()).toBeTruthy();
+    expect(bodyText.trim()).toBeTruthy();
 
-    const form = await page.$('.card-form-widget');
-    const input = await form.$('.input');
-    const submit = await form.$('.submit');
+    await popoverHeader.click();
+    await page.waitForSelector('.popover', { hidden: true });
 
-    await input.type('4111111111111112');
-    await submit.click();
-
-    const el = await input.getProperty('className');
-    let classList = await el.jsonValue();
-    classList = classList.split(' ');
-
-    expect(classList.includes('invalid')).toBe(true);
-    expect(classList.includes('valid')).toBe(false);
+    const popover = await page.$('.popover');
+    expect(popover).toBeNull();
   });
 });
