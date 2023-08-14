@@ -18,7 +18,6 @@ describe('Credit Card Validator form', () => {
 
   afterAll(async () => {
     await browser.close();
-    // server.kill();
   });
 
   test('should show and remove popover', async () => {
