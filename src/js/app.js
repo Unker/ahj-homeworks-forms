@@ -5,6 +5,8 @@ let actualPopovers = [];
 const popoverText = `This text is a very boring text and I bet you will not manage to read the whole text 
 since the only period in the text is the one that ends ...`;
 
+const container = document.querySelector('.container');
+
 const showPopover = (eaderText, bodyText, el) => {
   actualPopovers.push({
     name: el.name,
@@ -29,5 +31,6 @@ button.type = 'button';
 button.innerHTML = 'Click to toggle popover';
 button.classList.add('btn', 'btn-lg', 'btn-danger');
 
-const container = document.querySelector('.container');
-container.appendChild(button);
+const tasks = container.querySelectorAll('.task');
+const task1 = tasks[0];
+task1.appendChild(button);
